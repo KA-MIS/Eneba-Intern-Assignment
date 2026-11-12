@@ -1,0 +1,168 @@
+
+import {
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+import { Navbar } from "./components/layout/Navbar";
+
+import {
+  HeroBanner,
+  type HeroBannerData,
+} from "./components/home/HeroBanner";
+
+import { CategorySlider } from "./components/home/CategorySlider";
+
+import { PlaceholderPage } from "./pages/PlaceholderPage";
+import { StorePage } from "./pages/StorePage";
+import { ProductPage } from "./pages/ProductPage";
+import { CartPage } from "./pages/CartPage";
+
+const previewBanner: HeroBannerData = {
+  badge: "Up to 90% off",
+  title: "Play more.",
+  highlightedTitle: "Pay less.",
+  description:
+    "Instant game key delivery. Verified sellers. Great prices on digital games.",
+};
+
+function HomePage() {
+  return (
+    <main className="w-full">
+      <HeroBanner data={previewBanner} />
+      <CategorySlider />
+    </main>
+  );
+}
+
+function Page({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <PlaceholderPage
+      title={title}
+      description={description}
+    />
+  );
+}
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-base">
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+
+        <Route path="/store" element={<StorePage />} />
+
+        <Route path="/cart" element={<CartPage />} />
+
+        <Route
+          path="/search"
+          element={
+            <Page
+              title="Search Results"
+              description="Find your next game."
+            />
+          }
+        />
+
+        <Route
+          path="/product/:slug"
+          element={<ProductPage />}
+        />
+
+        <Route
+          path="/deals"
+          element={
+            <Page
+              title="Today's Deals"
+              description="Explore special offers."
+            />
+          }
+        />
+
+        <Route
+          path="/new"
+          element={
+            <Page
+              title="New Releases"
+              description="Discover new games."
+            />
+          }
+        />
+
+        <Route
+          path="/gift-cards"
+          element={
+            <Page
+              title="Gift Cards"
+              description="Browse digital gift cards."
+            />
+          }
+        />
+
+        <Route
+          path="/checkout"
+          element={
+            <Page
+              title="Checkout"
+              description="Sign in to complete your purchase."
+            />
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <Page
+              title="Sign In"
+              description="Access your account."
+            />
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <Page
+              title="Create Account"
+              description="Register a new account."
+            />
+          }
+        />
+
+        <Route
+          path="/account/orders"
+          element={
+            <Page
+              title="Order History"
+              description="View your previous purchases."
+            />
+          }
+        />
+
+        <Route
+          path="/404"
+          element={
+            <Page
+              title="404 – Page Not Found"
+              description="This page does not exist."
+            />
+          }
+        />
+
+        <Route
+          path="*"
+          element={<Navigate to="/404" replace />}
+        />
+      </Routes>
+    </div>
+  );
+}

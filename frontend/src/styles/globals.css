@@ -1,0 +1,78 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #0E0620;
+  --bg-surface: #1A0E33;
+  --bg-elevated: #251547;
+  --bg-muted: #12082A;
+
+  --lime: #C6F135;
+  --lime-hover: #D4FF3F;
+  --lime-soft: #C6F1351A;
+
+  --violet: #7C3AED;
+  --violet-soft: #7C3AED33;
+  --magenta: #E43B9B;
+  --cyan: #35D0F1;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #B8AEDB;
+  --text-muted: #6E6590;
+  --text-on-lime: #0E0620;
+
+  --border: #2E1E52;
+  --border-hover: #4A3480;
+
+  --success: #35F1A0;
+  --warning: #FFB020;
+  --danger: #FF4D6D;
+}
+
+@layer base {
+  body {
+    @apply min-h-screen bg-base text-ink-primary font-sans antialiased;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .text-gradient {
+    @apply bg-gradient-to-r from-lime via-cyan to-violet bg-clip-text text-transparent;
+  }
+
+  .badge-lime {
+    @apply px-2.5 py-1 rounded-pill bg-lime/15 text-lime text-xs font-semibold border border-lime/30;
+  }
+
+  .section-title {
+    @apply font-display font-bold text-2xl md:text-3xl tracking-tight;
+  }
+
+  .card-lift {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-card;
+  }
+
+  .focus-lime:focus-visible {
+    @apply outline-none ring-2 ring-lime ring-offset-2 ring-offset-base;
+  }
+}
+/* Remove default browser spacing */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
