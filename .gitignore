@@ -1,0 +1,32 @@
+# Environment files and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+# Dependencies
+**/node_modules/
+**/vendor/
+
+# Builds and tooling
+**/dist/
+**/build/
+**/coverage/
+**/.vite/
+**/.cache/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Private certificates / keys
+backend/certs/
+*.pem
+*.key
+*.p12
+*.pfx
