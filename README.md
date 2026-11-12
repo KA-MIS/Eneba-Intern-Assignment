@@ -80,6 +80,3 @@ Open `http://localhost:5173`.
 
 AI-assisted development is part of this assignment. Keep the required AI usage/conversation documentation for the final submission.
 
-## License / trademarks
-
-Educational project. Eneba and referenced game/product trademarks belong to their respective owners. This project is not affiliated with or endorsed by Eneba.
