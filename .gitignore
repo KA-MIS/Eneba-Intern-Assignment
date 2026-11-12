@@ -1,4 +1,4 @@
-﻿# Environment files and credentials
+# Environment files and credentials
 .env
 .env.*
 !.env.example
