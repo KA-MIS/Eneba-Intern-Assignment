@@ -3,10 +3,13 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
+import { CheckoutHeader } from "./components/layout/CheckoutHeader";
+import { AccountLayout } from "./components/layout/AccountLayout";
 
 import {
   HeroBanner,
@@ -16,32 +19,51 @@ import {
 import { CategorySlider } from "./components/home/CategorySlider";
 import { RecommendedProducts } from "./components/home/RecommendedProducts";
 import { TopGames } from "./components/home/TopGames";
-import { BestSellingGiftCards } from "./components/home/BestSellingGiftCards";
-import { BestSellingGiftCardProducts } from "./components/home/BestSellingGiftCardProducts";
-import { UpcomingGames } from "./components/home/UpcomingGames";
+import { GiftCards } from "./components/home/GiftCards";
 import { GameCategories } from "./components/home/GameCategories";
+import { RecentlyViewed } from "./components/home/RecentlyViewed";
+
+// ======================================
+// STORE PAGES
+// ======================================
 
 import { PlaceholderPage } from "./pages/PlaceholderPage";
 import { StorePage } from "./pages/StorePage";
 import { ProductPage } from "./pages/ProductPage";
 import { CartPage } from "./pages/CartPage";
 import { CheapGamesPage } from "./pages/CheapGamesPage";
-
-import { giftCardProducts } from "./data/giftCardProducts";
-import { upcomingGames } from "./data/upcomingGames";
-
-import { RecentlyViewed } from "./components/home/RecentlyViewed";
+import { SearchPage } from "./pages/SearchPage";
+import { GiftCardsPage } from "./pages/GiftCardsPage";
+import { CheckoutPage } from "./pages/CheckoutPage";
 
 // ======================================
-// HERO BANNER DATA
+// AUTHENTICATION
+// ======================================
+
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+
+// ======================================
+// ACCOUNT PAGES
+// ======================================
+
+import { AccountPage } from "./pages/AccountPage";
+import { AccountSettingsPage } from "./pages/AccountSettingsPage";
+import { OrdersPage } from "./pages/OrdersPage";
+import { OrderDetailsPage } from "./pages/OrderDetailsPage";
+import { KeysLibraryPage } from "./pages/KeysLibraryPage";
+import { WalletPage } from "./pages/WalletPage";
+
+// ======================================
+// HERO BANNER
 // ======================================
 
 const previewBanner: HeroBannerData = {
-  badge: "Up to 90% off",
+  badge: "Digital Game Marketplace",
   title: "Play more.",
   highlightedTitle: "Pay less.",
   description:
-    "Instant game key delivery. Verified sellers. Great prices on digital games.",
+    "Discover digital games, compare seller offers and find great prices.",
 };
 
 // ======================================
@@ -52,23 +74,11 @@ function HomePage() {
   return (
     <main className="w-full">
       <HeroBanner data={previewBanner} />
-
       <CategorySlider />
-
       <RecommendedProducts />
-
       <TopGames />
-
-      <BestSellingGiftCards />
-
-      <BestSellingGiftCardProducts
-        products={giftCardProducts}
-      />
-
-      <UpcomingGames products={upcomingGames} />
-
+      <GiftCards />
       <GameCategories />
-
       <RecentlyViewed />
     </main>
   );
@@ -98,16 +108,34 @@ function Page({
 // ======================================
 
 export default function App() {
+  const location = useLocation();
+
+  const isCheckoutFlow =
+    location.pathname === "/cart" ||
+    location.pathname === "/checkout";
+
+  const isAccountFlow =
+    location.pathname === "/account" ||
+    location.pathname.startsWith("/account/");
+
   return (
     <div className="flex min-h-screen flex-col bg-base">
+      {/* ======================================
+          NAVIGATION
+      ====================================== */}
 
-      {/* NAVIGATION */}
-      <Navbar />
+      {isCheckoutFlow ? (
+        <CheckoutHeader />
+      ) : isAccountFlow ? null : (
+        <Navbar />
+      )}
 
-      {/* PAGE CONTENT */}
+      {/* ======================================
+          PAGE CONTENT
+      ====================================== */}
+
       <div className="flex-1">
         <Routes>
-
           {/* HOMEPAGE */}
           <Route
             path="/"
@@ -126,15 +154,16 @@ export default function App() {
             element={<CartPage />}
           />
 
+          {/* CHECKOUT */}
+          <Route
+            path="/checkout"
+            element={<CheckoutPage />}
+          />
+
           {/* SEARCH */}
           <Route
             path="/search"
-            element={
-              <Page
-                title="Search Results"
-                description="Find your next game."
-              />
-            }
+            element={<SearchPage />}
           />
 
           {/* PRODUCT DETAILS */}
@@ -143,7 +172,7 @@ export default function App() {
             element={<ProductPage />}
           />
 
-          {/* CHEAP GAMES PROMOTION */}
+          {/* DEALS */}
           <Route
             path="/deals"
             element={<CheapGamesPage />}
@@ -155,7 +184,7 @@ export default function App() {
             element={
               <Page
                 title="New Releases"
-                description="Discover new games."
+                description="New game listings will appear here when available."
               />
             }
           />
@@ -163,12 +192,7 @@ export default function App() {
           {/* GIFT CARDS */}
           <Route
             path="/gift-cards"
-            element={
-              <Page
-                title="Gift Cards"
-                description="Browse digital gift cards."
-              />
-            }
+            element={<GiftCardsPage />}
           />
 
           {/* SOFTWARE */}
@@ -177,18 +201,7 @@ export default function App() {
             element={
               <Page
                 title="Software"
-                description="Explore software offers."
-              />
-            }
-          />
-
-          {/* CHECKOUT */}
-          <Route
-            path="/checkout"
-            element={
-              <Page
-                title="Checkout"
-                description="Sign in to complete your purchase."
+                description="Software offers are not available yet."
               />
             }
           />
@@ -196,59 +209,115 @@ export default function App() {
           {/* LOGIN */}
           <Route
             path="/login"
-            element={
-              <Page
-                title="Sign In"
-                description="Access your account."
-              />
-            }
+            element={<LoginPage />}
           />
 
           {/* REGISTER */}
           <Route
             path="/register"
-            element={
-              <Page
-                title="Create Account"
-                description="Register a new account."
-              />
-            }
+            element={<RegisterPage />}
           />
 
-          {/* ORDER HISTORY */}
+          {/* ======================================
+              ACCOUNT
+          ====================================== */}
+
           <Route
-            path="/account/orders"
-            element={
-              <Page
-                title="Order History"
-                description="View your previous purchases."
-              />
-            }
-          />
+            path="/account"
+            element={<AccountLayout />}
+          >
+            {/* OVERVIEW */}
+            <Route
+              index
+              element={<AccountPage />}
+            />
 
-          {/* 404 PAGE */}
+            {/* DEMO WALLET */}
+            <Route
+              path="balance"
+              element={<WalletPage />}
+            />
+
+            {/* ORDERS */}
+            <Route
+              path="orders"
+              element={<OrdersPage />}
+            />
+
+            {/* ORDER DETAILS */}
+            <Route
+              path="orders/:orderId"
+              element={<OrderDetailsPage />}
+            />
+
+            {/* KEYS LIBRARY */}
+            <Route
+              path="keys"
+              element={<KeysLibraryPage />}
+            />
+
+            {/* ACCOUNT SETTINGS */}
+            <Route
+              path="settings"
+              element={<AccountSettingsPage />}
+            />
+
+            {/* SUPPORT TICKETS - PLACEHOLDER */}
+            <Route
+              path="tickets"
+              element={
+                <Page
+                  title="Support Tickets"
+                  description="Support ticket functionality is coming soon."
+                />
+              }
+            />
+
+            {/* LOGIN HISTORY - PLACEHOLDER */}
+            <Route
+              path="login-history"
+              element={
+                <Page
+                  title="Login History"
+                  description="Login history will be available when account activity logging is implemented."
+                />
+              }
+            />
+          </Route>
+
+          {/* ======================================
+              ERROR PAGES
+          ====================================== */}
+
           <Route
             path="/404"
             element={
               <Page
-                title="404 – Page Not Found"
+                title="404 - Page Not Found"
                 description="This page does not exist."
               />
             }
           />
 
-          {/* UNKNOWN ROUTES */}
           <Route
             path="*"
-            element={<Navigate to="/404" replace />}
+            element={
+              <Navigate
+                to="/404"
+                replace
+              />
+            }
           />
-
         </Routes>
       </div>
 
-      {/* FOOTER */}
-      <Footer />
+      {/* ======================================
+          FOOTER
+      ====================================== */}
 
+      {!isCheckoutFlow && !isAccountFlow && (
+        <Footer />
+      )}
     </div>
   );
 }

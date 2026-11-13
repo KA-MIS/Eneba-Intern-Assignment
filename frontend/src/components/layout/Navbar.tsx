@@ -1,15 +1,21 @@
 ﻿
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useCart } from "../../context/CartContext";
+
 import { SearchBar } from "../ui/SearchBar";
 import { CategoriesSidebar } from "./CategoriesSidebar";
+import { MiniCart } from "./MiniCart";
+import { useAuth } from "../../context/AuthContext";
 
 export function Navbar() {
-  const { itemCount } = useCart();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
+
+  const accountRef = useRef<HTMLDivElement>(null);
+
+  const { user, loading, signOut } = useAuth();
 
   const categories = [
     { label: "Cheap Games", path: "/deals" },
@@ -20,10 +26,57 @@ export function Navbar() {
     { label: "GTA 6", path: "/search?q=GTA%206" },
   ];
 
+  const accountLinks = [
+    { label: "My Account", path: "/account" },
+    { label: "My Orders", path: "/account/orders" },
+    { label: "Keys Library", path: "/account/keys" },
+    { label: "Settings", path: "/account/settings" },
+  ];
+
   const openCategories = () => {
     setMobileMenuOpen(false);
     setCategoriesOpen(true);
   };
+
+  // Close account menu when clicking outside
+  useEffect(() => {
+    function handleOutsideClick(event: MouseEvent) {
+      if (
+        accountRef.current &&
+        !accountRef.current.contains(event.target as Node)
+      ) {
+        setAccountOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setAccountOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  async function handleLogout() {
+    setLogoutError("");
+
+    const result = await signOut();
+
+    if (result.error) {
+      setLogoutError(result.error);
+      return;
+    }
+
+    setAccountOpen(false);
+    setMobileMenuOpen(false);
+  }
 
   return (
     <>
@@ -90,82 +143,167 @@ export function Navbar() {
                 </svg>
               </Link>
 
-              {/* CART */}
-              <Link
-                to="/cart"
-                aria-label={`Shopping cart, ${itemCount} items`}
-                className="
-                  relative transition-colors
-                  hover:text-[#FFDD00]
-                "
-              >
-                <svg
-                  className="h-7 w-7"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  aria-hidden="true"
-                >
-                  <circle cx="9" cy="21" r="1" />
-                  <circle cx="20" cy="21" r="1" />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"
-                  />
-                </svg>
+              {/* MINI CART */}
+              <MiniCart />
 
-                {itemCount > 0 && (
-                  <span
-                    className="
-                      absolute -right-2 -top-2
-                      flex h-[17px] min-w-[17px]
-                      items-center justify-center
-                      rounded-full bg-magenta px-1
-                      text-[10px] font-bold text-white
-                    "
-                  >
-                    {itemCount > 99 ? "99+" : itemCount}
-                  </span>
+              {/* ACCOUNT - DESKTOP */}
+              <div
+                ref={accountRef}
+                className="relative hidden sm:block"
+              >
+                {loading ? (
+                  <div className="h-8 w-24 animate-pulse rounded bg-white/10" />
+                ) : user ? (
+                  <>
+                    {/* LOGGED-IN USER BUTTON */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAccountOpen((open) => !open);
+                        setLogoutError("");
+                      }}
+                      aria-expanded={accountOpen}
+                      aria-haspopup="true"
+                      className="
+                        flex items-center gap-2
+                        text-sm font-semibold text-white
+                        transition-colors hover:text-[#C6F135]
+                      "
+                    >
+                      <span
+                        className="
+                          flex h-9 w-9 items-center
+                          justify-center rounded-full
+                          bg-[#251547] text-[#C6F135]
+                        "
+                      >
+                        {user.email?.charAt(0).toUpperCase() || "U"}
+                      </span>
+
+                      <span className="max-w-28 truncate">
+                        {user.email?.split("@")[0] || "My account"}
+                      </span>
+
+                      <span aria-hidden="true">
+                        {accountOpen ? "⌃" : "⌄"}
+                      </span>
+                    </button>
+
+                    {/* ACCOUNT DROPDOWN */}
+                    {accountOpen && (
+                      <div
+                        className="
+                          absolute right-0 top-full z-[100]
+                          mt-3 w-72 rounded-xl
+                          border border-[#49336D]
+                          bg-[#1A0E33] p-2 shadow-2xl
+                        "
+                      >
+                        {/* USER INFO */}
+                        <div className="border-b border-[#49336D] px-3 py-4">
+                          <p className="text-xs text-[#B8AEDB]">
+                            Signed in as
+                          </p>
+
+                          <p className="mt-1 truncate text-sm font-semibold">
+                            {user.email}
+                          </p>
+                        </div>
+
+                        {/* ACCOUNT LINKS */}
+                        <div className="py-2">
+                          {accountLinks.map((item) => (
+                            <Link
+                              key={item.path}
+                              to={item.path}
+                              onClick={() => setAccountOpen(false)}
+                              className="
+                                block rounded-lg px-3 py-3
+                                text-sm text-white
+                                transition-colors
+                                hover:bg-[#251547]
+                                hover:text-[#C6F135]
+                              "
+                            >
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
+
+                        {/* LOGOUT */}
+                        <div className="border-t border-[#49336D] pt-2">
+                          <button
+                            type="button"
+                            onClick={handleLogout}
+                            className="
+                              w-full rounded-lg px-3 py-3
+                              text-left text-sm text-red-300
+                              transition-colors
+                              hover:bg-[#251547]
+                            "
+                          >
+                            Log out
+                          </button>
+
+                          {logoutError && (
+                            <p
+                              role="alert"
+                              className="px-3 py-2 text-xs text-red-300"
+                            >
+                              {logoutError}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  /* NOT LOGGED IN */
+                  <div className="flex items-center gap-2 text-xs font-semibold">
+                    <svg
+                      className="h-6 w-6 shrink-0 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="7" r="4" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4 21v-2a8 8 0 0116 0v2"
+                      />
+                    </svg>
+
+                    <Link
+                      to="/login"
+                      className="whitespace-nowrap text-white transition-colors hover:text-[#FFDD00]"
+                    >
+                      Log in
+                    </Link>
+
+                    <span className="text-white/50">|</span>
+
+                    <Link
+                      to="/register"
+                      className="whitespace-nowrap text-white transition-colors hover:text-[#FFDD00]"
+                    >
+                      Register
+                    </Link>
+                  </div>
                 )}
-              </Link>
+              </div>
 
-              {/* ACCOUNT */}
-              <Link
-                to="/login"
-                className="
-                  hidden items-center gap-2
-                  text-xs font-semibold
-                  transition-colors
-                  hover:text-[#FFDD00] sm:flex
-                "
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="7" r="4" />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 21v-2a8 8 0 0116 0v2"
-                  />
-                </svg>
-                <span>Log in | Register</span>
-              </Link>
-
-              {/* MOBILE MENU */}
+              {/* MOBILE MENU BUTTON */}
               <button
                 type="button"
                 aria-label="Toggle navigation"
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-navigation"
-                onClick={() => setMobileMenuOpen((open) => !open)}
+                onClick={() =>
+                  setMobileMenuOpen((open) => !open)
+                }
                 className="
                   rounded p-2 hover:bg-white/10
                   md:hidden
@@ -226,9 +364,13 @@ export function Navbar() {
                 hover:bg-[#170B34]
               "
             >
-              <span aria-hidden="true" className="text-xl">
+              <span
+                aria-hidden="true"
+                className="text-xl"
+              >
                 ☰
               </span>
+
               Categories
             </button>
 
@@ -261,6 +403,7 @@ export function Navbar() {
               md:hidden
             "
           >
+            {/* CATEGORIES */}
             <button
               type="button"
               onClick={openCategories}
@@ -276,6 +419,7 @@ export function Navbar() {
               ☰ Categories
             </button>
 
+            {/* CATEGORY LINKS */}
             {categories.map((category) => (
               <Link
                 key={`${category.label}-${category.path}`}
@@ -290,17 +434,73 @@ export function Navbar() {
               </Link>
             ))}
 
-            <Link
-              to="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="
-                rounded px-3 py-3 text-sm
-                text-white hover:bg-white/10
-                sm:hidden
-              "
-            >
-              Log in | Register
-            </Link>
+            {/* MOBILE ACCOUNT */}
+            {loading ? (
+              <p className="px-3 py-3 text-sm text-[#B8AEDB]">
+                Loading account...
+              </p>
+            ) : user ? (
+              <>
+                <p className="truncate px-3 py-3 text-sm text-[#C6F135]">
+                  {user.email}
+                </p>
+
+                {accountLinks.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="
+                      rounded px-3 py-3 text-sm
+                      text-white hover:bg-white/10
+                    "
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="
+                    rounded px-3 py-3 text-left
+                    text-sm text-red-300 hover:bg-white/10
+                  "
+                >
+                  Log out
+                </button>
+
+                {logoutError && (
+                  <p role="alert" className="px-3 text-xs text-red-300">
+                    {logoutError}
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="
+                    rounded px-3 py-3 text-sm
+                    text-white hover:text-[#FFDD00]
+                  "
+                >
+                  Log in
+                </Link>
+
+                <Link
+                  to="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="
+                    rounded px-3 py-3 text-sm
+                    text-white hover:text-[#FFDD00]
+                  "
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </nav>
         )}
       </header>

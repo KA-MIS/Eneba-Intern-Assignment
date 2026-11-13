@@ -33,3 +33,32 @@ backend/certs/
 
 # Visual Studio temporary files
 .vs/
+
+# Local backups
+*.backup
+*.backup.*
+*.bak
+*backup*/
+*Backup*/
+
+# Temporary inspection files
+frontend-filter-files.txt
+frontend/filter-system-inspection.txt
+
+# Local development data
+backend/data/
+
+# Secrets and environment
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+backend/certs/
+
+# Dependencies
+**/node_modules/
+**/vendor/

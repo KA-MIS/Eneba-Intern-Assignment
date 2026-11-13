@@ -1,51 +1,64 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProducts } from "../../services/productService";
 import { Link } from "react-router-dom";
 import {
   Swords,
   Map,
   Gamepad2,
-  Crosshair,
   Shield,
   Ghost,
-  Puzzle,
   CircleDot,
   Flag,
   Zap,
-  Blocks,
-  Waves,
-  MousePointerClick,
-  Music2,
-  Lightbulb,
   Car,
   ChevronDown,
   ChevronUp,
-  Sparkles,
 } from "lucide-react";
 
 const categories = [
-  { id: "action", name: "Action", count: 20370, icon: Zap },
-  { id: "adventure", name: "Adventure", count: 19623, icon: Map },
-  { id: "simulation", name: "Simulation", count: 15587, icon: Car },
-  { id: "strategy", name: "Strategy", count: 14827, icon: Flag },
-  { id: "rpg", name: "RPG", count: 5544, icon: Shield },
-  { id: "indie", name: "Indie", count: 5374, icon: Ghost },
-  { id: "fps-tps", name: "FPS / TPS", count: 2753, icon: Crosshair },
-  { id: "puzzle", name: "Puzzle", count: 1525, icon: Puzzle },
-  { id: "sport", name: "Sport", count: 1397, icon: CircleDot },
-  { id: "racing", name: "Racing", count: 1199, icon: Flag },
-  { id: "fighting", name: "Fighting", count: 799, icon: Swords },
-  { id: "platform", name: "Platform", count: 676, icon: Blocks },
-  { id: "hack-slash", name: "Hack & Slash", count: 597, icon: Waves },
-  { id: "arcade", name: "Arcade", count: 472, icon: Gamepad2 },
-  { id: "point-click", name: "Point & Click", count: 287, icon: MousePointerClick },
-  { id: "mmo", name: "MMO", count: 210, icon: Swords },
-  { id: "music", name: "Music", count: 74, icon: Music2 },
-  { id: "educational", name: "Educational", count: 30, icon: Lightbulb },
+  { name: "Action", icon: Zap },
+  { name: "Adventure", icon: Map },
+  { name: "Simulation", icon: Car },
+  { name: "Strategy", icon: Flag },
+  { name: "RPG", icon: Shield },
+  { name: "Indie", icon: Ghost },
+  { name: "Sports", icon: CircleDot },
+  { name: "Racing", icon: Flag },
+  { name: "Casual", icon: Gamepad2 },
+  { name: "Massively Multiplayer", icon: Swords },
+  { name: "Early Access", icon: Zap },
+  { name: "Free To Play", icon: Gamepad2 },
 ];
 
 export function GameCategories() {
   const [expanded, setExpanded] = useState(false);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadCounts() {
+      try {
+        const all = [];
+        for (let page = 1; page <= 100; page++) {
+          const batch = await getProducts({ category: "game", limit: 100, page }, controller.signal);
+          all.push(...batch);
+          if (batch.length < 100) break;
+        }
+        if (controller.signal.aborted) return;
+        const next: Record<string, number> = {};
+        for (const product of all) {
+          for (const genre of product.genres ?? []) {
+            next[genre] = (next[genre] ?? 0) + 1;
+          }
+        }
+        setCounts(next);
+      } catch (error) {
+        if (!controller.signal.aborted) console.error("Failed to load genre counts", error);
+      }
+    }
+    void loadCounts();
+    return () => controller.abort();
+  }, []);
 
   const visibleCategories = expanded
     ? categories
@@ -79,8 +92,8 @@ export function GameCategories() {
 
             return (
               <Link
-                key={category.id}
-                to={`/store?category=${encodeURIComponent(category.id)}`}
+                key={category.name}
+                to={`/store?genre=${encodeURIComponent(category.name)}`}
                 className="
                   group flex min-h-[140px]
                   flex-col items-center justify-between
@@ -94,7 +107,7 @@ export function GameCategories() {
               >
                 {/* CATEGORY COUNT */}
                 <span className="text-[13px] font-bold">
-                  {category.count}
+                  {counts[category.name] ?? "–"}
                 </span>
 
                 {/* ICON */}

@@ -8,176 +8,236 @@ const euro = new Intl.NumberFormat("en-IE", {
 });
 
 export function CartPage() {
-  const { items, removeItem, itemCount, subtotal } = useCart();
+  const { items, removeItem, clearCart, itemCount, subtotal } =
+    useCart();
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-8">
-        <h1 className="font-display text-4xl font-bold text-white">
-          Shopping Cart
-        </h1>
-        <p className="mt-2 text-ink-secondary">
-          Review your selected games before checkout.
-        </p>
-      </div>
+    <main className="min-h-screen bg-[#4519AC] text-white">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        {/* PAGE TITLE */}
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl font-bold">
+              My shopping cart
+            </h1>
 
-      {items.length === 0 ? (
-        <section className="flex flex-col items-center justify-center
-          rounded-xl border border-line bg-surface px-6 py-20
-          text-center">
-          <div className="mb-6 text-6xl" aria-hidden="true">
-            🛒
+            <p className="mt-2 text-sm text-white/70">
+              Review your selected digital products.
+            </p>
           </div>
 
-          <h2 className="font-display text-2xl font-bold text-white">
-            Your cart is empty
-          </h2>
+          {items.length > 0 && (
+            <button
+              type="button"
+              onClick={clearCart}
+              className="text-sm text-white/70 underline underline-offset-4 hover:text-white"
+            >
+              Clear cart
+            </button>
+          )}
+        </div>
 
-          <p className="mt-3 max-w-md text-ink-secondary">
-            Looks like you haven't added any games yet.
-            Explore our store and find your next adventure.
-          </p>
-
-          <Link
-            to="/store"
-            className="mt-8 rounded-xl bg-lime px-8 py-3
-              font-bold text-base transition-colors
-              hover:bg-lime-hover"
-          >
-            Browse games
-          </Link>
-        </section>
-      ) : (
-        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
-          <section className="space-y-4 lg:col-span-2">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white">
-                Your items
-              </h2>
-              <span className="text-sm text-ink-secondary">
-                {itemCount} {itemCount === 1 ? "item" : "items"}
-              </span>
+        {/* EMPTY CART */}
+        {items.length === 0 ? (
+          <section className="mx-auto max-w-2xl bg-[#321477] px-6 py-16 text-center">
+            <div
+              aria-hidden="true"
+              className="mb-5 text-5xl text-[#C6F135]"
+            >
+              ⓘ
             </div>
 
-            {items.map((item) => (
-              <article
-                key={item.offerId}
-                className="flex gap-4 rounded-xl border
-                  border-line bg-surface p-4 sm:gap-6 sm:p-5"
-              >
-                <Link
-                  to={`/product/${encodeURIComponent(item.slug)}`}
-                  className="h-32 w-24 shrink-0 overflow-hidden
-                    rounded-lg bg-elevated"
-                >
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="h-full w-full object-cover"
-                  />
-                </Link>
+            <h2 className="font-display text-2xl font-bold">
+              Your shopping cart is empty
+            </h2>
 
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <Link
-                    to={`/product/${encodeURIComponent(item.slug)}`}
-                    className="font-semibold text-white hover:text-lime"
-                  >
-                    {item.title}
-                  </Link>
-
-                  <p className="mt-2 text-xs font-semibold text-cyan">
-                    {item.platform} / {item.region}
-                  </p>
-
-                  <p className="mt-2 text-sm text-ink-secondary">
-                    Sold by{" "}
-                    <span className="text-white">
-                      {item.seller}
-                    </span>
-                  </p>
-
-                  <div className="mt-auto flex items-end justify-between gap-3">
-                    <p className="text-xl font-bold text-lime">
-                      {euro.format(item.price)}
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={() => removeItem(item.offerId)}
-                      className="rounded-lg border border-line px-3 py-2
-                        text-sm text-ink-secondary transition-colors
-                        hover:border-danger hover:text-danger"
-                      >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+            <p className="mt-3 text-sm text-white/65">
+              It seems you haven't chosen any products yet.
+            </p>
 
             <Link
               to="/store"
-              className="inline-flex items-center gap-2
-                text-sm font-semibold text-lime hover:underline"
+              className="mt-8 inline-flex items-center justify-center bg-[#C6F135] px-8 py-3 text-sm font-bold text-[#211342] transition-colors hover:bg-[#D4FF3F]"
             >
-              ← Continue shopping
+              Explore games
             </Link>
           </section>
+        ) : (
+          /* CART CONTENT */
+          <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+            {/* LEFT COLUMN */}
+            <div className="min-w-0 space-y-4">
+              <section className="bg-[#321477] p-4 sm:p-5">
+                <div className="mb-5 flex items-center justify-between">
+                  <h2 className="font-display text-lg font-bold">
+                    My cart
+                  </h2>
 
-          <aside className="rounded-xl border border-line
-            bg-surface p-6 lg:sticky lg:top-24">
-            <h2 className="font-display text-2xl font-bold text-white">
-              Order summary
-            </h2>
+                  <span className="text-sm text-white/70">
+                    {itemCount}{" "}
+                    {itemCount === 1 ? "product" : "products"}
+                  </span>
+                </div>
 
-            <div className="mt-6 space-y-4">
-              <div className="flex justify-between text-sm">
-                <span className="text-ink-secondary">Subtotal</span>
-                <span className="text-white">
+                <div className="space-y-3">
+                  {items.map((item) => (
+                    <article
+                      key={item.offerId}
+                      className="flex gap-4 bg-[#211342] p-3 sm:p-4"
+                    >
+                      {/* PRODUCT IMAGE */}
+                      <Link
+                        to={`/product/${encodeURIComponent(item.slug)}`}
+                        className="h-28 w-20 shrink-0 overflow-hidden bg-[#170C32] sm:h-32 sm:w-24"
+                      >
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="h-full w-full object-cover"
+                        />
+                      </Link>
+
+                      {/* PRODUCT DETAILS */}
+                      <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="mb-1 text-xs text-white/60">
+                              Sold by{" "}
+                              <span className="font-semibold text-[#C6F135]">
+                                {item.seller}
+                              </span>
+                            </p>
+
+                            <Link
+                              to={`/product/${encodeURIComponent(item.slug)}`}
+                              className="font-semibold text-white hover:text-[#C6F135]"
+                            >
+                              {item.title}
+                            </Link>
+
+                            <p className="mt-2 text-xs font-bold text-[#35D0F1]">
+                              {item.platform} · {item.region}
+                            </p>
+                          </div>
+
+                          {/* REMOVE BUTTON */}
+                          <button
+                            type="button"
+                            onClick={() => removeItem(item.offerId)}
+                            aria-label={`Remove ${item.title}`}
+                            title="Remove product"
+                            className="shrink-0 p-1 text-white/60 hover:text-red-300"
+                          >
+                            <svg
+                              width="19"
+                              height="19"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v7M14 10v7" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* QUANTITY AND PRICE */}
+                        <div className="mt-auto flex items-end justify-between gap-3 pt-4">
+                          <span className="text-xs text-white/60">
+                            Quantity: {item.quantity}
+                          </span>
+
+                          <span className="text-xl font-bold">
+                            {euro.format(
+                              item.price * item.quantity
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              {/* SHOPPING LINKS */}
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <Link
+                  to="/store"
+                  className="text-sm font-semibold text-[#C6F135] hover:underline"
+                >
+                  ← Continue shopping
+                </Link>
+
+                <Link
+                  to="/gift-cards"
+                  className="text-sm text-white/75 hover:text-white"
+                >
+                  Browse gift cards →
+                </Link>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN - ORDER SUMMARY */}
+            <aside className="bg-[#321477] p-5 lg:sticky lg:top-24">
+              <h2 className="mb-5 font-display text-lg font-bold">
+                Order summary
+              </h2>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between gap-3">
+                  <span className="text-white/70">
+                    Products ({itemCount})
+                  </span>
+
+                  <span>{euro.format(subtotal)}</span>
+                </div>
+
+                <div className="flex justify-between gap-3">
+                  <span className="text-white/70">
+                    Service fee
+                  </span>
+
+                  <span className="text-white/60">
+                    Not calculated
+                  </span>
+                </div>
+              </div>
+
+              <div className="my-5 border-t border-white/15" />
+
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-bold">
+                  Subtotal
+                </span>
+
+                <span className="text-2xl font-bold">
                   {euro.format(subtotal)}
                 </span>
               </div>
 
-              <div className="flex justify-between text-sm">
-                <span className="text-ink-secondary">Service fee</span>
-                <span className="text-white">
-                  Calculated at checkout
-                </span>
-              </div>
+              <p className="mt-2 text-xs text-white/60">
+                Final total and availability must be confirmed
+                before payment.
+              </p>
 
-              <div className="border-t border-line pt-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-white">
-                    Subtotal
-                  </span>
-                  <span className="text-2xl font-bold text-lime">
-                    {euro.format(subtotal)}
-                  </span>
-                </div>
+{/* CHECKOUT NAVIGATION */}
+<Link
+  to="/checkout"
+  className="mt-6 flex w-full items-center justify-center bg-[#C6F135] px-4 py-3 text-sm font-bold text-[#211342] transition hover:bg-[#D4FF3F]"
+>
+  Proceed to checkout
+</Link>
 
-                <p className="mt-2 text-xs text-ink-muted">
-                  Final total will be confirmed at checkout.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              disabled
-              title="Checkout integration coming soon"
-              className="mt-6 w-full rounded-xl bg-lime
-                px-5 py-3 font-bold text-base
-                disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Proceed to checkout
-            </button>
-
-            <p className="mt-4 text-center text-xs text-ink-muted">
-              Demo checkout — no payment will be processed.
-            </p>
-          </aside>
-        </div>
-      )}
+              <p className="mt-3 text-center text-xs text-white/60">
+                Demo cart — no payment will be processed.
+              </p>
+            </aside>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

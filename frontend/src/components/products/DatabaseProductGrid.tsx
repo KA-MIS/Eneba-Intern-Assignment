@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
+import { ProductGrid } from "./ProductGrid";
 import { getProducts } from "../../services/productService";
 import type { Product } from "../../types/product";
 
@@ -43,8 +43,8 @@ export default function DatabaseProductGrid() {
 
   if (loading) {
     return (
-      <div className="py-16 text-center text-white/60">
-        Loading products from Supabase...
+      <div className="py-16 text-center text-ink-secondary">
+        Loading products...
       </div>
     );
   }
@@ -52,27 +52,10 @@ export default function DatabaseProductGrid() {
   if (error) {
     return (
       <div className="py-16 text-center text-red-400">
-        {error}
+        Failed to load products: {error}
       </div>
     );
   }
 
-  if (products.length === 0) {
-    return (
-      <div className="py-16 text-center text-white/60">
-        No products found.
-      </div>
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-        />
-      ))}
-    </div>
-  );
+  return <ProductGrid products={products} />;
 }

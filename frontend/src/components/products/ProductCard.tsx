@@ -1,36 +1,30 @@
-﻿import { useState } from "react";
+﻿
+import { useState } from "react";
 import { Link } from "react-router-dom";
+
 import type { Product } from "../../types/product";
+import { getProductDetails } from "../../services/productService";
 import { useCart } from "../../context/CartContext";
-import { AddedToCartModal } from "../cart/AddedToCartModal";
+import { AddToCartModal } from "./AddToCartModal";
 
 interface ProductCardProps {
   product: Product;
 }
 
+type ModalStatus = "loading" | "success" | "error";
+
 export function ProductCard({ product }: ProductCardProps) {
-  const { addItem, items } = useCart();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addItem, items, itemCount } = useCart();
 
-  const offerId = `demo-${product.slug}`;
-  const isInCart = items.some((item) => item.offerId === offerId);
+  const [modalStatus, setModalStatus] =
+    useState<ModalStatus | null>(null);
 
-  const handleAddToCart = () => {
-    addItem({
-      offerId,
-      productId: product.slug,
-      slug: product.slug,
-      title: product.title,
-      imageUrl: product.imageUrl,
-      platform: product.platform,
-      region: product.region,
-      seller: "Demo seller",
-      price: product.lowestPrice,
-      currency: product.currency,
-    });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
 
-    setIsModalOpen(true);
-  };
+  const alreadyInCart = items.some(
+    (item) => item.productId === product.id
+  );
 
   const discount =
     product.originalPrice !== null &&
@@ -45,7 +39,72 @@ export function ProductCard({ product }: ProductCardProps) {
     currency: product.currency,
   });
 
-  const productUrl = `/product/${encodeURIComponent(product.slug)}`;
+  const productUrl =
+    `/product/${encodeURIComponent(product.slug)}`;
+
+  async function handleAddToCart() {
+    if (isAdding) return;
+
+    if (alreadyInCart) {
+      setModalStatus("success");
+      return;
+    }
+
+    setIsAdding(true);
+    setErrorMessage("");
+    setModalStatus("loading");
+
+    try {
+      const details = await getProductDetails(product.slug);
+
+      if (!details) {
+        throw new Error("Product not found.");
+      }
+
+      const availableOffers = details.offers.filter(
+        (offer) =>
+          offer.available &&
+          Number.isFinite(Number(offer.price)) &&
+          Number(offer.price) >= 0
+      );
+
+      if (availableOffers.length === 0) {
+        throw new Error("No available seller offers.");
+      }
+
+      const cheapestOffer = availableOffers.reduce(
+        (cheapest, current) =>
+          Number(current.price) < Number(cheapest.price)
+            ? current
+            : cheapest
+      );
+
+      addItem({
+        offerId: cheapestOffer.id,
+        productId: details.id,
+        slug: details.slug,
+        title: details.title,
+        imageUrl: details.imageUrl,
+        platform: details.platform,
+        region: details.region,
+        seller: cheapestOffer.sellerName,
+        price: Number(cheapestOffer.price),
+        currency: cheapestOffer.currency,
+      });
+
+      setModalStatus("success");
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not add product to cart."
+      );
+
+      setModalStatus("error");
+    } finally {
+      setIsAdding(false);
+    }
+  }
 
   return (
     <>
@@ -53,15 +112,16 @@ export function ProductCard({ product }: ProductCardProps) {
         className="group relative h-[430px] w-full min-w-0
           hover:z-30 focus-within:z-30"
       >
-        {/* MAIN CARD - fixed height */}
         <div
           className="absolute inset-0 flex flex-col overflow-hidden
             rounded-xl border border-line bg-surface
-            transition-[border-color,box-shadow] duration-200 ease-out
-            group-hover:border-line-hover group-hover:shadow-card
+            transition-[border-color,box-shadow]
+            duration-200 ease-out
+            group-hover:border-line-hover
+            group-hover:shadow-card
             group-focus-within:border-lime"
         >
-          {/* IMAGE - shrinks on hover */}
+          {/* IMAGE */}
           <div
             className="relative h-[190px] w-full shrink-0
               overflow-hidden rounded-t-xl bg-elevated
@@ -78,31 +138,33 @@ export function ProductCard({ product }: ProductCardProps) {
                 src={product.imageUrl}
                 alt={product.title}
                 loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="h-full w-full object-cover
+                  transition-transform duration-300
+                  group-hover:scale-105"
               />
             </Link>
 
-            {/* DISCOUNT */}
             {discount > 0 && (
               <span
-                className="pointer-events-none absolute left-3 top-3
-                  rounded bg-magenta px-2 py-1
-                  text-xs font-bold text-white"
+                className="pointer-events-none absolute
+                  left-3 top-3 rounded bg-magenta
+                  px-2 py-1 text-xs font-bold text-white"
               >
                 -{discount}%
               </span>
             )}
 
-            {/* WISHLIST */}
+            {/* WISHLIST - NOT IMPLEMENTED YET */}
             <button
               type="button"
               disabled
               aria-label={`Add ${product.title} to wishlist`}
               title="Wishlist coming soon"
-              className="absolute right-3 top-3 flex h-8 w-8
-                items-center justify-center rounded-full
-                bg-black/50 text-white backdrop-blur-sm
-                disabled:cursor-not-allowed disabled:opacity-60"
+              className="absolute right-3 top-3 flex
+                h-8 w-8 items-center justify-center
+                rounded-full bg-black/50 text-white
+                backdrop-blur-sm disabled:cursor-not-allowed
+                disabled:opacity-60"
             >
               <svg
                 className="h-5 w-5"
@@ -119,14 +181,6 @@ export function ProductCard({ product }: ProductCardProps) {
                 />
               </svg>
             </button>
-
-            {/* CASHBACK BADGE */}
-            <div
-              className="pointer-events-none absolute bottom-0 left-0
-                bg-cyan px-3 py-1.5 text-xs font-bold text-base"
-            >
-              CASHBACK
-            </div>
           </div>
 
           {/* PLATFORM */}
@@ -152,21 +206,25 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.title}
             </Link>
 
-            <p className="mt-1 text-[13px] font-bold uppercase text-cyan">
+            <p
+              className="mt-1 text-[13px] font-bold
+                uppercase text-cyan"
+            >
               {product.region}
             </p>
 
-            {/* PRICE */}
             <div className="mt-auto">
               {discount > 0 && (
                 <div
-                  className="mb-1 flex flex-wrap items-center gap-2
-                    text-[13px] text-ink-secondary"
+                  className="mb-1 flex flex-wrap items-center
+                    gap-2 text-[13px] text-ink-secondary"
                 >
                   <span>From</span>
+
                   <span className="line-through">
                     {formatter.format(product.originalPrice!)}
                   </span>
+
                   <span className="font-bold text-lime">
                     -{discount}%
                   </span>
@@ -177,16 +235,16 @@ export function ProductCard({ product }: ProductCardProps) {
                 {formatter.format(product.lowestPrice)}
               </p>
 
-              <p className="mt-1 text-[13px] font-bold text-lime">
-                Demo cashback: {formatter.format(product.lowestPrice * 0.11)}
+              <p className="mt-1 text-xs text-ink-secondary">
+                From available sellers
               </p>
             </div>
           </div>
 
-          {/* HOVER ACTIONS - inside fixed card */}
+          {/* HOVER ACTIONS */}
           <div
-            className="grid shrink-0 grid-rows-[0fr] opacity-0
-              transition-[grid-template-rows,opacity]
+            className="grid shrink-0 grid-rows-[0fr]
+              opacity-0 transition-[grid-template-rows,opacity]
               duration-200 ease-out
               group-hover:grid-rows-[1fr]
               group-hover:opacity-100
@@ -200,24 +258,32 @@ export function ProductCard({ product }: ProductCardProps) {
               >
                 <button
                   type="button"
-                  onClick={handleAddToCart}
-                  disabled={isInCart}
-                  title={isInCart ? "Already in cart" : "Add to cart"}
-                  className="w-full rounded bg-lime px-4 py-2.5
-                    text-sm font-bold text-base
-                    transition-colors hover:bg-lime-hover
-                    disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={() => void handleAddToCart()}
+                  disabled={isAdding}
+                  className="flex w-full items-center
+                    justify-center rounded bg-lime
+                    px-4 py-2.5 text-sm font-bold
+                    text-base transition-colors
+                    hover:bg-lime-hover
+                    disabled:cursor-wait
+                    disabled:opacity-70"
                 >
-                  {isInCart ? "In cart" : "Add to cart"}
+                  {isAdding
+                    ? "Adding..."
+                    : alreadyInCart
+                      ? "In cart ✓"
+                      : "Add to cart"}
                 </button>
 
                 <Link
                   to={`${productUrl}#seller-offers`}
-                  className="flex w-full items-center justify-center
-                    rounded border-2 border-[#3b2b5c]
-                    px-4 py-2 text-sm font-bold text-white
+                  className="flex w-full items-center
+                    justify-center rounded border-2
+                    border-[#3b2b5c] px-4 py-2
+                    text-sm font-bold text-white
                     hover:border-white hover:bg-white/5
-                    focus-visible:outline-2 focus-visible:outline-lime"
+                    focus-visible:outline-2
+                    focus-visible:outline-lime"
                 >
                   View offers
                 </Link>
@@ -227,17 +293,14 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
       </article>
 
-      {/* MODAL - Renders outside the card to avoid overflow issues */}
-      <AddedToCartModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        product={{
-          title: product.title,
-          imageUrl: product.imageUrl,
-          price: product.lowestPrice,
-          currency: product.currency,
-        }}
-      />
+      {modalStatus !== null && (
+        <AddToCartModal
+          status={modalStatus}
+          itemCount={itemCount}
+          errorMessage={errorMessage}
+          onClose={() => setModalStatus(null)}
+        />
+      )}
     </>
   );
 }
