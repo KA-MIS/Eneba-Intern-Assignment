@@ -1,4 +1,4 @@
-
+﻿
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -21,6 +21,8 @@ const emptyFilters: CatalogFilterValues = {
   region: "",
   platform: "",
   brand: "",
+  genre: "",
+  os: "",
 };
 
 type SortOption = NonNullable<ProductFilters["sort"]>;
@@ -153,7 +155,7 @@ export function GiftCardsPage() {
           <Link to="/" className="hover:text-[#C6F135]">
             Home
           </Link>
-          <span className="mx-2">›</span>
+          <span className="mx-2">â€º</span>
           <Link
             to="/gift-cards"
             className="hover:text-[#C6F135]"
@@ -163,7 +165,7 @@ export function GiftCardsPage() {
 
           {filters.brand && (
             <>
-              <span className="mx-2">›</span>
+              <span className="mx-2">â€º</span>
               <span>{filters.brand}</span>
             </>
           )}
@@ -258,3 +260,4 @@ export function GiftCardsPage() {
     </main>
   );
 }
+
