@@ -19,6 +19,7 @@ header('Referrer-Policy: no-referrer');
 $allowedOrigins = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://eneba-intern-assignment.vercel.app',
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
