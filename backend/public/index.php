@@ -53,6 +53,28 @@ if ($method === 'OPTIONS') {
 
 try {
     // ======================================
+    // HOMEPAGE BANNERS
+    // ======================================
+
+    if ($path === '/api/homepage/banners' && $method === 'GET') {
+        $pdo = Connection::create();
+
+        $statement = $pdo->query(
+            'SELECT id, label, image_full, image_small,
+                    destination_path, sort_order
+             FROM public.homepage_banners
+             WHERE is_active = TRUE
+             ORDER BY sort_order ASC, id ASC'
+        );
+
+        echo json_encode(
+            ['data' => $statement->fetchAll()],
+            JSON_THROW_ON_ERROR
+        );
+
+        exit;
+    }
+    // ======================================
     // HEALTH
     // ======================================
 
@@ -332,6 +354,24 @@ try {
         exit;
     }
 
+    // HOMEPAGE BANNERS
+    if ($path === '/api/homepage/banners' && $method === 'GET') {
+        $pdo = Connection::create();
+
+        $statement = $pdo->query(
+            'SELECT id, label, image_full, image_small,
+                    destination_path, sort_order
+             FROM public.homepage_banners
+             WHERE is_active = TRUE
+             ORDER BY sort_order ASC, id ASC'
+        );
+
+        echo json_encode(
+            ['data' => $statement->fetchAll()],
+            JSON_THROW_ON_ERROR
+        );
+        exit;
+    }
     // ======================================
     // PRODUCTS
     // ======================================

@@ -11,10 +11,7 @@ import { Footer } from "./components/layout/Footer";
 import { CheckoutHeader } from "./components/layout/CheckoutHeader";
 import { AccountLayout } from "./components/layout/AccountLayout";
 
-import {
-  HeroBanner,
-  type HeroBannerData,
-} from "./components/home/HeroBanner";
+import { HeroBanner } from "./components/home/HeroBanner";
 
 import { CategorySlider } from "./components/home/CategorySlider";
 import { RecommendedProducts } from "./components/home/RecommendedProducts";
@@ -60,13 +57,7 @@ import { WalletPage } from "./pages/WalletPage";
 // HERO BANNER
 // ======================================
 
-const previewBanner: HeroBannerData = {
-  badge: "Digital Game Marketplace",
-  title: "Play more.",
-  highlightedTitle: "Pay less.",
-  description:
-    "Discover digital games, compare seller offers and find great prices.",
-};
+
 
 // ======================================
 // HOMEPAGE
@@ -75,7 +66,7 @@ const previewBanner: HeroBannerData = {
 function HomePage() {
   return (
     <main className="w-full">
-      <HeroBanner data={previewBanner} />
+      <HeroBanner />
       <CategorySlider />
       <RecommendedProducts />
       <TopGames />
