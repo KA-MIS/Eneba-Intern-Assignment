@@ -66,6 +66,9 @@ export function AuthProvider({
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
     return { error: error?.message ?? null };

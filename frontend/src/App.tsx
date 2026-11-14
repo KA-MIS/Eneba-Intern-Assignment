@@ -42,6 +42,8 @@ import { CheckoutPage } from "./pages/CheckoutPage";
 
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
+import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 
 // ======================================
 // ACCOUNT PAGES
@@ -212,6 +214,8 @@ export default function App() {
             element={<LoginPage />}
           />
 
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
           {/* REGISTER */}
           <Route
             path="/register"

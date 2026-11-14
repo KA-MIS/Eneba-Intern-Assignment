@@ -1,10 +1,11 @@
 
 import { useState, type FormEvent } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export function RegisterPage() {
   const { user, loading, signUp } = useAuth();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,9 +43,10 @@ export function RegisterPage() {
       if (result.error) {
         setError(result.error);
       } else {
-        setSuccess(
-          "Registration submitted. If email confirmation is enabled, check your inbox and follow the verification instructions."
-        );
+        navigate("/verify-email", {
+          replace: true,
+          state: { email: email.trim() },
+        });
       }
     } finally {
       setSubmitting(false);
