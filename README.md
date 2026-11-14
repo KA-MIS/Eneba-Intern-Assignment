@@ -8,7 +8,7 @@ A full-stack digital gaming marketplace built as an internship assignment. The p
 |---|---|
 | **Live demo** | [https://eneba-intern-assignment.vercel.app/](https://eneba-intern-assignment.vercel.app/) |
 | **GitHub source code** | [KA-MIS/Eneba-Intern-Assignment](https://github.com/KA-MIS/Eneba-Intern-Assignment) |
-| **AI development history** | [ChatGPT conversation — prompts and responses](https://chatgpt.com/share/6af7b9e8-73ac-83ed-b707-73414066df36) |
+| **AI development history** | Provided privately by email upon request |
 
 ## Reviewer demo account
 
@@ -138,11 +138,7 @@ npm run build
 
 ## AI-assisted development
 
-AI tools were used during development as a coding and learning aid. The shared conversation below documents prompts and responses:
-
-- [Open the ChatGPT development conversation](https://chatgpt.com/share/6af7b9e8-73ac-83ed-b707-73414066df36)
-
-The conversation link should be checked before submission to ensure that the evaluators can access it and that it covers the development work being submitted. If additional development conversations were used, include those separately.
+AI tools were used as a coding and learning aid. Further development details can be provided privately by email upon request.
 
 ## Project status
 
