@@ -407,7 +407,6 @@ final class CheckoutController
             CURLOPT_CONNECTTIMEOUT => 5,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_CAINFO => dirname(__DIR__, 2) . '/certs/cacert.pem',
             CURLOPT_HTTPHEADER => [
                 'Authorization: Bearer ' . $accessToken,
                 'apikey: ' . $publishableKey,
