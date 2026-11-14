@@ -151,7 +151,38 @@ final class ProductController
             throw new InvalidArgumentException('minPrice cannot exceed maxPrice.');
         }
 
-        $sql .= ' ORDER BY ' . $sortOptions[$sort];
+        if ($search !== '' && $sort === 'title_asc') {
+            $sql .= '
+                ORDER BY
+                    CASE
+                        WHEN LOWER(title) = LOWER(:rank_exact)
+                            THEN 0
+                        WHEN LOWER(title) LIKE LOWER(:rank_prefix)
+                            THEN 1
+                        WHEN LOWER(title) LIKE LOWER(:rank_contains)
+                            THEN 2
+                        ELSE 3
+                    END ASC,
+                    extensions.similarity(
+                        LOWER(title),
+                        LOWER(:rank_fuzzy)
+                    ) DESC,
+                    title ASC';
+
+            $parameters[':rank_exact'] = $search;
+
+            $escapedRank = str_replace(
+                ['\\', '%', '_'],
+                ['\\\\', '\%', '\_'],
+                $search
+            );
+
+            $parameters[':rank_prefix'] = $escapedRank . '%';
+            $parameters[':rank_contains'] = '%' . $escapedRank . '%';
+            $parameters[':rank_fuzzy'] = $search;
+        } else {
+            $sql .= ' ORDER BY ' . $sortOptions[$sort];
+        }
         if ($sort !== 'random') {
             $sql .= ', id ASC';
         }
