@@ -78,5 +78,9 @@ Open `http://localhost:5173`.
 
 ## Assignment notes
 
-AI-assisted development is part of this assignment. Keep the required AI usage/conversation documentation for the final submission.
+AI-assisted development was used for this assignment. The original shared ChatGPT conversation is available here:
+
+- **[AI development conversation (prompts and responses)](https://chatgpt.com/share/6af7b9e8-73ac-83ed-b707-73414066df36)**
+
+The link is provided as the AI chat deliverable. Before submitting, confirm that it is publicly accessible and covers the complete required development history; any work completed in separate AI conversations should be supplied separately.
 
