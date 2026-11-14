@@ -1,3 +1,4 @@
+import { RecentActivityPopup } from "./components/ui/RecentActivityPopup";
 
 import {
   Routes,
@@ -305,6 +306,8 @@ export default function App() {
           />
         </Routes>
       </div>
+
+      {!isCheckoutFlow && !isAccountFlow && <RecentActivityPopup />}
 
       {/* ======================================
           FOOTER
