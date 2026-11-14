@@ -10,6 +10,15 @@ A full-stack digital gaming marketplace built as an internship assignment. The p
 | **GitHub source code** | [KA-MIS/Eneba-Intern-Assignment](https://github.com/KA-MIS/Eneba-Intern-Assignment) |
 | **AI development history** | [ChatGPT conversation — prompts and responses](https://chatgpt.com/share/6af7b9e8-73ac-83ed-b707-73414066df36) |
 
+## Reviewer demo account
+
+A pre-created Supabase Auth account is available for reviewers, so registration and email verification are not required.
+
+- **Login email:** `test@gmail.com`
+- **Password:** provided privately with the assignment submission (not stored in this repository)
+
+Open the [live demo](https://eneba-intern-assignment.vercel.app/), select **Sign in**, and use the reviewer credentials. The account can be used to explore the demo checkout flow with demo wallet funds.
+
 ## Overview
 
 The application is designed as a digital marketplace for games and gift cards. It provides a responsive storefront and supporting account and checkout flows.
