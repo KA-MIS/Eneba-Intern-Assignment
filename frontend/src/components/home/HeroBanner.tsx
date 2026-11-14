@@ -17,7 +17,7 @@ const API_URL = (
 
 export function HeroBanner() {
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [activeId, setActiveId] = useState("deals");
+  const [activeId, setActiveId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -32,21 +32,25 @@ export function HeroBanner() {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to load promotions");
+          throw new Error("Failed to load banners");
         }
 
         const result: { data?: Banner[] } =
           await response.json();
 
         if (!Array.isArray(result.data)) {
-          throw new Error("Invalid banner response");
+          throw new Error("Invalid response");
         }
 
         if (!controller.signal.aborted) {
-          setBanners(result.data);
+          const sorted = [...result.data].sort(
+            (a, b) => a.sort_order - b.sort_order
+          );
+
+          setBanners(sorted);
           setActiveId(
-            result.data.find((item) => item.id === "deals")?.id ??
-            result.data[0]?.id ??
+            sorted.find((item) => item.id === "main")?.id ??
+            sorted[0]?.id ??
             ""
           );
         }
@@ -69,62 +73,67 @@ export function HeroBanner() {
     return (
       <section
         aria-label="Loading promotions"
-        className="h-[240px] animate-pulse bg-[#4519AC] sm:h-[300px] lg:h-[380px]"
+        className="h-[380px] animate-pulse bg-[#251547]"
       />
     );
   }
 
   if (error || banners.length === 0) {
     return (
-      <section className="bg-[#4519AC] px-5 py-8 text-center text-white">
+      <section className="bg-[#251547] p-8 text-center text-white">
         {error || "No promotions available."}
       </section>
     );
   }
 
-  const activeBanner =
-    banners.find((banner) => banner.id === activeId) ??
-    banners[0];
-
-  const sideBanners = banners.filter(
-    (banner) => banner.id !== activeBanner.id
-  );
-
   return (
     <section
       aria-label="Featured promotions"
-      className="m-0 w-full bg-[#4519AC] p-0"
+      className="w-full bg-[#32117C]"
     >
-      <div className="flex h-[240px] w-full gap-[2px] overflow-hidden sm:h-[300px] lg:h-[380px]">
-        <Link
-          to={activeBanner.destination_path}
-          aria-label={`Open ${activeBanner.label}`}
-          className="relative block h-full min-w-0 flex-[4] overflow-hidden"
-        >
-          <img
-            src={activeBanner.image_full}
-            alt={activeBanner.label}
-            className="block h-full w-full object-cover"
-          />
-        </Link>
+      <div className="flex h-[230px] w-full gap-[3px] overflow-hidden sm:h-[310px] lg:h-[380px]">
 
-        <div className="flex h-full min-w-0 flex-1 gap-[2px]">
-          {sideBanners.map((banner) => (
-            <button
+        {banners.map((banner) => {
+          const active = banner.id === activeId;
+
+          return (
+            <div
               key={banner.id}
-              type="button"
-              onClick={() => setActiveId(banner.id)}
-              aria-label={`Show ${banner.label}`}
-              className="relative h-full min-w-0 flex-1 overflow-hidden bg-[#251547] focus-visible:outline-2 focus-visible:outline-lime"
+              className="relative h-full min-w-0 overflow-hidden transition-[flex] duration-500 ease-in-out"
+              style={{
+                flex: active ? "7 1 0%" : "1 1 0%",
+              }}
             >
-              <img
-                src={banner.image_small}
-                alt=""
-                className="block h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-              />
-            </button>
-          ))}
-        </div>
+              {active ? (
+                <Link
+                  to={banner.destination_path}
+                  aria-label={`Open ${banner.label}`}
+                  className="group relative block h-full w-full overflow-hidden"
+                >
+                  <img
+                    src={banner.image_full}
+                    alt={banner.label}
+                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.015]"
+                  />
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setActiveId(banner.id)}
+                  aria-label={`Show ${banner.label}`}
+                  className="group relative block h-full w-full overflow-hidden bg-[#251547] focus-visible:outline-2 focus-visible:outline-[#C6F135]"
+                >
+                  <img
+                    src={banner.image_small}
+                    alt={banner.label}
+                    className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  />
+                </button>
+              )}
+            </div>
+          );
+        })}
+
       </div>
     </section>
   );
