@@ -174,7 +174,7 @@ export function CheckoutPage() {
 
       clearCart();
 
-      navigate(`/account/orders/${orderId}`, {
+      navigate(`/checkout/success/${orderId}`, {
         replace: true,
       });
 
