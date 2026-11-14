@@ -33,6 +33,7 @@ import { CheapGamesPage } from "./pages/CheapGamesPage";
 import { SearchPage } from "./pages/SearchPage";
 import { GiftCardsPage } from "./pages/GiftCardsPage";
 import { CheckoutPage } from "./pages/CheckoutPage";
+import { PurchaseSuccessPage } from "./pages/PurchaseSuccessPage";
 
 // ======================================
 // AUTHENTICATION
@@ -106,7 +107,8 @@ export default function App() {
 
   const isCheckoutFlow =
     location.pathname === "/cart" ||
-    location.pathname === "/checkout";
+    location.pathname === "/checkout" ||
+    location.pathname.startsWith("/checkout/success/");
 
   const isAccountFlow =
     location.pathname === "/account" ||
@@ -152,6 +154,11 @@ export default function App() {
           <Route
             path="/checkout"
             element={<CheckoutPage />}
+          />
+
+          <Route
+            path="/checkout/success/:orderId"
+            element={<PurchaseSuccessPage />}
           />
 
           {/* SEARCH */}
