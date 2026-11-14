@@ -89,12 +89,25 @@ final class ProductController
         $parameters = [':category' => $category];
 
         if ($search !== '') {
-            $sql .= " AND title ILIKE :search ESCAPE '\\'";
-            $parameters[':search'] = '%' . str_replace(
+            $sql .= " AND (
+                title ILIKE :search_pattern ESCAPE '\\'
+                OR (
+                    CHAR_LENGTH(:search_length_check) >= 3
+                    AND extensions.similarity(
+                        LOWER(title),
+                        LOWER(:search_fuzzy)
+                    ) >= 0.20
+                )
+            )";
+
+            $parameters[':search_pattern'] = '%' . str_replace(
                 ['\\', '%', '_'],
                 ['\\\\', '\\%', '\\_'],
                 $search
             ) . '%';
+
+            $parameters[':search_length_check'] = $search;
+            $parameters[':search_fuzzy'] = $search;
         }
         if ($platform !== '') {
             $sql .= ' AND platform = :platform';
