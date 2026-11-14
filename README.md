@@ -19,6 +19,10 @@ A pre-created Supabase Auth account is available for reviewers, so registration 
 
 Open the [live demo](https://eneba-intern-assignment.vercel.app/), select **Sign in**, and use the reviewer credentials. The account can be used to explore the demo checkout flow with demo wallet funds.
 
+## Registration and email verification
+
+User registration is implemented with Supabase Auth. New users can create an account, but **they must verify their email address using the confirmation link sent to their Gmail inbox (or other email provider)** before signing in and using the account. Reviewers who prefer to skip registration can use the pre-created demo account above.
+
 ## Overview
 
 The application is designed as a digital marketplace for games and gift cards. It provides a responsive storefront and supporting account and checkout flows.
