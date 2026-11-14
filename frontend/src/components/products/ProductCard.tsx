@@ -1,4 +1,4 @@
-﻿
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -109,7 +109,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <>
       <article
-        className="group relative h-[430px] w-full min-w-0
+        className="group relative h-[460px] w-full min-w-0
           hover:z-30 focus-within:z-30"
       >
         <div
@@ -123,7 +123,7 @@ export function ProductCard({ product }: ProductCardProps) {
         >
           {/* IMAGE */}
           <div
-            className="relative h-[190px] w-full shrink-0
+            className="relative h-[210px] w-full shrink-0
               overflow-hidden rounded-t-xl bg-elevated
               transition-[height] duration-200 ease-out
               group-hover:h-[115px]
@@ -200,7 +200,7 @@ export function ProductCard({ product }: ProductCardProps) {
           >
             <Link
               to={productUrl}
-              className="line-clamp-2 text-[15px] font-bold
+              className="line-clamp-2 text-[16px] font-bold
                 leading-snug text-white hover:text-lime"
             >
               {product.title}

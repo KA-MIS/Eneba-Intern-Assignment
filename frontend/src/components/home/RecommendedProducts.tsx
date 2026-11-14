@@ -1,4 +1,4 @@
-﻿
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductGrid } from "../products/ProductGrid";
@@ -43,7 +43,7 @@ export function RecommendedProducts() {
       aria-labelledby="recommended-heading"
       className="w-full bg-[#4519AC] py-8"
     >
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto max-w-[1120px] px-4">
         <div className="mb-6 flex items-center gap-2">
           <h2
             id="recommended-heading"

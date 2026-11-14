@@ -76,3 +76,11 @@ body,
 body {
   min-height: 100vh;
 }
+
+
+/* Desktop layout scale - similar to Chrome 125% */
+@media (min-width: 1280px) {
+  #root {
+    zoom: 1.25;
+  }
+}

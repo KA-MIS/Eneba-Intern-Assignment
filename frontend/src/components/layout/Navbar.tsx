@@ -1,4 +1,4 @@
-﻿
+
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
@@ -85,7 +85,7 @@ export function Navbar() {
         <div className="bg-[#4219A8]">
           <div
             className="
-              mx-auto flex h-[92px] max-w-7xl
+              mx-auto flex h-[92px] max-w-[1120px]
               items-center gap-5 px-4
             "
           >
@@ -342,7 +342,7 @@ export function Navbar() {
           <nav
             aria-label="Store navigation"
             className="
-              mx-auto flex h-[46px] max-w-7xl
+              mx-auto flex h-[46px] max-w-[1120px]
               items-center gap-6
               overflow-x-auto px-4
             "
